@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="FlyExp:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/FlyExp_jar</output-path>
+    <root id="root">
+      <element id="archive" name="FlyExp.jar">
+        <element id="module-output" name="FlyExp" />
+      </element>
+      <element id="library" level="application" name="spigot-1.8.8" />
+    </root>
+  </artifact>
+</component>

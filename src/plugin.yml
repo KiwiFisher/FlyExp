@@ -1,0 +1,5 @@
+name: FlyExp
+main: com.kiwifisher.flyexp.FlyExp
+version: 1.0
+commands:
+  flyexp:
