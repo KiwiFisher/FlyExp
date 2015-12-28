@@ -33,8 +33,6 @@ public class CommandHandler implements CommandExecutor {
 
             if (player.hasPermission("flyexp.use")) {
 
-                boolean nowFlying;
-
                 player.setAllowFlight(!player.getAllowFlight());
                 player.sendMessage(player.getAllowFlight() ? ChatColor.GREEN + "You are now able to fly!" : ChatColor.RED + "You disabled flight mode");
 
