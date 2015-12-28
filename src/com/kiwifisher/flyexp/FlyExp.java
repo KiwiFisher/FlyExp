@@ -2,23 +2,18 @@ package com.kiwifisher.flyexp;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class FlyExp extends JavaPlugin {
-
-    public static Plugin plugin;
-    private static int decreaseAmount;
-    private static ArrayList<Player> flightEnabledPlayers = new ArrayList<>();
+    private int decreaseAmount;
+    private ArrayList<Player> flightEnabledPlayers = new ArrayList<>();
 
     @Override
     public void onEnable() {
-        plugin = this;
 
         /*
         Copy in the default config
@@ -29,13 +24,12 @@ public class FlyExp extends JavaPlugin {
         /*
         Register command
          */
-        getCommand("flyexp").setExecutor(new CommandHandler());
+        getCommand("flyexp").setExecutor(new CommandHandler(this));
 
         /*
         Get config values and assign them to instance variables
          */
-        decreaseAmount = getConfig().getInt("decrease-amount-per-second");
-
+        this.decreaseAmount = getConfig().getInt("decrease-amount-per-second");
 
         /*
         Start a repeating task to check players
@@ -44,7 +38,13 @@ public class FlyExp extends JavaPlugin {
             @Override
             public void run() {
 
-                for (Player player : getFlightEnabledPlayers()) {
+                /*
+                Uses iterator as else removing the player causes a ConcurrentModificationException as you can't remove an index of
+                and array you are looking through.
+                 */
+                for (Iterator<Player> iterator = getFlightEnabledPlayers().iterator(); iterator.hasNext();) {
+
+                    Player player = iterator.next();
 
                         /*
                         If the player is flying and doesn't have the bypass permission, then decrease their EXP.
@@ -65,7 +65,9 @@ public class FlyExp extends JavaPlugin {
                                  */
                             player.setAllowFlight(false);
                             player.sendMessage(ChatColor.RED + "You ran out of exp! Your flight stopped working");
-                            getFlightEnabledPlayers().remove(player);
+                            if (getFlightEnabledPlayers().contains(player)) {
+                                iterator.remove();
+                            }
 
                         }
 
@@ -89,7 +91,7 @@ public class FlyExp extends JavaPlugin {
 
     }
 
-    public static List<Player> getFlightEnabledPlayers() {
+    public List<Player> getFlightEnabledPlayers() {
         return flightEnabledPlayers;
     }
 
