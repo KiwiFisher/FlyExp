@@ -14,50 +14,58 @@ public class FlyExp extends JavaPlugin {
 
     public static Plugin plugin;
     private static int decreaseAmount;
-    private static List<Player> flightEnabledPlayers = new ArrayList<>();
+    private static ArrayList<Player> flightEnabledPlayers = new ArrayList<>();
 
     @Override
     public void onEnable() {
         plugin = this;
 
+        /*
+        Copy in the default config
+         */
         getConfig().options().copyDefaults(true);
         saveConfig();
 
+        /*
+        Register command
+         */
         getCommand("flyexp").setExecutor(new CommandHandler());
+
+        /*
+        Get config values and assign them to instance variables
+         */
         decreaseAmount = getConfig().getInt("decrease-amount-per-second");
 
 
+        /*
+        Start a repeating task to check players
+         */
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
 
-                List<World> allWorlds = getServer().getWorlds();
-
-                for (World world : allWorlds) {
-
-                    for (Player player : world.getPlayers()) {
+                for (Player player : getFlightEnabledPlayers()) {
 
                         /*
                         If the player is flying and doesn't have the bypass permission, then decrease their EXP.
                          */
-                        if (getFlightEnabledPlayers().contains(player) && !player.hasPermission("flyexp.bypass") && player.getGameMode() != GameMode.CREATIVE) {
+                    if (getFlightEnabledPlayers().contains(player) && !player.hasPermission("flyexp.bypass") && player.getGameMode() != GameMode.CREATIVE) {
 
-                            if (player.isFlying() && (player.getLevel() > 0 || player.getExp() > 0 || player.getTotalExperience() > 0)) {
+                        if (player.isFlying() && (player.getLevel() > 0 || player.getExp() > 0 || player.getTotalExperience() > 0)) {
 
                                 /*
                                 Decrease amount is half because this runable does checks twice per second.
                                  */
-                                decreaseExp(player, decreaseAmount);
+                            decreaseExp(player, decreaseAmount);
 
-                            } else if (player.getLevel() <= 0 || player.getExp() <= 0 || player.getTotalExperience() <= 0){
+                        } else if (player.getLevel() <= 0 || player.getExp() <= 0 || player.getTotalExperience() <= 0){
 
                                 /*
                                 If the player has 0 exp left, stop them flying.
                                  */
-                                player.setAllowFlight(false);
-                                player.sendMessage(ChatColor.RED + "You ran out of exp! Your flight stopped working");
-
-                            }
+                            player.setAllowFlight(false);
+                            player.sendMessage(ChatColor.RED + "You ran out of exp! Your flight stopped working");
+                            getFlightEnabledPlayers().remove(player);
 
                         }
 
